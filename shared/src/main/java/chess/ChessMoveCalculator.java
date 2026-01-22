@@ -124,11 +124,47 @@ public class ChessMoveCalculator {
     }
 
     private Collection<ChessMove> moveKing() {
-        return null;
+        List<ChessMove> returnMoves = new ArrayList<>();
+        boolean redundant = false;
+        if (position.getRow() + 1 <= 8) {
+            ChessPosition oneOfEight = new ChessPosition(position.getRow() + 1, position.getColumn());
+            redundant = checkSquare(returnMoves,oneOfEight);
+        }
+        if (position.getRow() + 1 <= 8 && position.getColumn() + 1 <= 8) {
+            ChessPosition twoOfEight = new ChessPosition(position.getRow() + 1, position.getColumn() + 1);
+            redundant = checkSquare(returnMoves,twoOfEight);
+        }
+        if (position.getColumn() + 1 <= 8) {
+            ChessPosition threeOfEight = new ChessPosition(position.getRow(), position.getColumn() + 1);
+            redundant = checkSquare(returnMoves,threeOfEight);
+        }
+        if (position.getRow() - 1 >= 1 && position.getColumn() + 1 <= 8) {
+            ChessPosition fourOfEight = new ChessPosition(position.getRow() - 1, position.getColumn() + 1);
+            redundant = checkSquare(returnMoves,fourOfEight);
+        }
+        if (position.getRow() - 1 >= 1) {
+            ChessPosition fiveOfEight = new ChessPosition(position.getRow() - 1, position.getColumn());
+            redundant = checkSquare(returnMoves,fiveOfEight);
+        }
+        if (position.getRow() - 1 >= 1 && position.getColumn() - 1 >= 1) {
+            ChessPosition sixOfEight = new ChessPosition(position.getRow() - 1, position.getColumn() - 1);
+            redundant = checkSquare(returnMoves,sixOfEight);
+        }
+        if (position.getColumn() - 1 >= 1) {
+            ChessPosition sevenOfEight = new ChessPosition(position.getRow(), position.getColumn() - 1);
+            redundant = checkSquare(returnMoves,sevenOfEight);
+        }
+        if (position.getRow() + 1 <= 8 && position.getColumn() - 1 >= 1) {
+            ChessPosition eightOfEight = new ChessPosition(position.getRow() + 1, position.getColumn() - 1);
+            redundant = checkSquare(returnMoves,eightOfEight);
+        }
+        return returnMoves;
     }
 
     private Collection<ChessMove> moveQueen() {
-        return null;
+        Collection<ChessMove> returnMoves = moveRook();
+        returnMoves.addAll(moveBishop());
+        return returnMoves;
     }
 
 }
