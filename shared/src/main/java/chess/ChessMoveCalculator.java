@@ -36,14 +36,26 @@ public class ChessMoveCalculator {
         return null;
     }
 
+    private void checkPromotionSquare(Collection<ChessMove> returnMoves, ChessPosition pawnPosition) {
+        if (pawnPosition.getRow() == 8 || pawnPosition.getRow() == 1) {
+            returnMoves.add(new ChessMove(position, pawnPosition, ChessPiece.PieceType.QUEEN));
+            returnMoves.add(new ChessMove(position, pawnPosition, ChessPiece.PieceType.ROOK));
+            returnMoves.add(new ChessMove(position, pawnPosition, ChessPiece.PieceType.KNIGHT));
+            returnMoves.add(new ChessMove(position, pawnPosition, ChessPiece.PieceType.BISHOP));
+        }
+        else {
+            returnMoves.add(new ChessMove(position, pawnPosition, null));
+        }
+    }
+
     private boolean checkSquare(Collection<ChessMove> returnMoves, ChessPosition incrementingPosition) {
         if (board.getPiece(incrementingPosition) == null) {
-            returnMoves.add(new ChessMove(position,incrementingPosition,null));
+            returnMoves.add(new ChessMove(position, incrementingPosition,null));
             return false;
         }
         if ((board.getPiece(incrementingPosition) != null)){
             if (board.getPiece(incrementingPosition).getTeamColor() != piece.getTeamColor()) {
-                returnMoves.add(new ChessMove(position,incrementingPosition,null));
+                returnMoves.add(new ChessMove(position, incrementingPosition,null));
             }
             return true;
         }
@@ -51,8 +63,63 @@ public class ChessMoveCalculator {
     }
 
     private Collection<ChessMove> movePawn() {
-        return null;
+        List<ChessMove> returnMoves = new ArrayList<>();
+        boolean redundant = false;
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            ChessPosition pawnPosition = new ChessPosition(position.getRow() + 1, position.getColumn());
+            if (board.getPiece(pawnPosition) == null) {
+                checkPromotionSquare(returnMoves, pawnPosition);
+                pawnPosition = new ChessPosition(position.getRow() + 2, position.getColumn());
+                if (position.getRow() == 2 && board.getPiece(pawnPosition) == null) {
+                    returnMoves.add(new ChessMove(position, pawnPosition, null));
+                }
+            }
+            if (position.getColumn() + 1 <= 8) {
+                pawnPosition = new ChessPosition(position.getRow() + 1, position.getColumn() + 1);
+                if (board.getPiece(pawnPosition) != null) {
+                    if (board.getPiece(pawnPosition).getTeamColor() == ChessGame.TeamColor.BLACK) {
+                        checkPromotionSquare(returnMoves, pawnPosition);
+                    }
+                }
+            }
+            if (position.getColumn() - 1 >= 1) {
+                pawnPosition = new ChessPosition(position.getRow() + 1, position.getColumn() - 1);
+                if (board.getPiece(pawnPosition) != null) {
+                    if (board.getPiece(pawnPosition).getTeamColor() == ChessGame.TeamColor.BLACK) {
+                        checkPromotionSquare(returnMoves, pawnPosition);
+                    }
+                }
+            }
+        }
+        else {
+            ChessPosition pawnPosition = new ChessPosition(position.getRow() - 1, position.getColumn());
+            if (board.getPiece(pawnPosition) == null) {
+                checkPromotionSquare(returnMoves, pawnPosition);
+                pawnPosition = new ChessPosition(position.getRow() - 2, position.getColumn());
+                if (position.getRow() == 7 && board.getPiece(pawnPosition) == null) {
+                    returnMoves.add(new ChessMove(position, pawnPosition, null));
+                }
+            }
+            if (position.getColumn() + 1 <= 8) {
+                pawnPosition = new ChessPosition(position.getRow() - 1, position.getColumn() + 1);
+                if (board.getPiece(pawnPosition) != null) {
+                    if (board.getPiece(pawnPosition).getTeamColor() == ChessGame.TeamColor.WHITE) {
+                        checkPromotionSquare(returnMoves, pawnPosition);
+                    }
+                }
+            }
+            if (position.getColumn() - 1 >= 1) {
+                pawnPosition = new ChessPosition(position.getRow() - 1, position.getColumn() - 1);
+                if (board.getPiece(pawnPosition) != null) {
+                    if (board.getPiece(pawnPosition).getTeamColor() == ChessGame.TeamColor.WHITE) {
+                        checkPromotionSquare(returnMoves, pawnPosition);
+                    }
+                }
+            }
+        }
+        return returnMoves;
     }
+
     private Collection<ChessMove> moveRook() {
         List<ChessMove> returnMoves = new ArrayList<>();
         int i = 1;
@@ -87,7 +154,41 @@ public class ChessMoveCalculator {
     }
 
     private Collection<ChessMove> moveKnight() {
-        return null;
+        List<ChessMove> returnMoves = new ArrayList<>();
+        boolean redundant = false;
+        if (position.getRow() + 2 <= 8 && position.getColumn() + 1 <= 8) {
+            ChessPosition oneOfEight = new ChessPosition(position.getRow() + 2, position.getColumn() + 1);
+            redundant = checkSquare(returnMoves,oneOfEight);
+        }
+        if (position.getRow() + 2 <= 8 && position.getColumn() - 1 >= 1) {
+            ChessPosition oneOfEight = new ChessPosition(position.getRow() + 2, position.getColumn() - 1);
+            redundant = checkSquare(returnMoves,oneOfEight);
+        }
+        if (position.getRow() - 2 >= 1 && position.getColumn() - 1 >= 1) {
+            ChessPosition oneOfEight = new ChessPosition(position.getRow() - 2, position.getColumn() - 1);
+            redundant = checkSquare(returnMoves,oneOfEight);
+        }
+        if (position.getRow() - 2 >= 1 && position.getColumn() + 1 <= 8) {
+            ChessPosition oneOfEight = new ChessPosition(position.getRow() - 2, position.getColumn() + 1);
+            redundant = checkSquare(returnMoves,oneOfEight);
+        }
+        if (position.getRow() + 1 <= 8 && position.getColumn() + 2 <= 8) {
+            ChessPosition oneOfEight = new ChessPosition(position.getRow() + 1, position.getColumn() + 2);
+            redundant = checkSquare(returnMoves,oneOfEight);
+        }
+        if (position.getRow() + 1 <= 8 && position.getColumn() - 2 >= 1) {
+            ChessPosition oneOfEight = new ChessPosition(position.getRow() + 1, position.getColumn() - 2);
+            redundant = checkSquare(returnMoves,oneOfEight);
+        }
+        if (position.getRow() - 1 >= 1 && position.getColumn() - 2 >= 1) {
+            ChessPosition oneOfEight = new ChessPosition(position.getRow() - 1, position.getColumn() - 2);
+            redundant = checkSquare(returnMoves,oneOfEight);
+        }
+        if (position.getRow() - 1 >= 1 && position.getColumn() + 2 <= 8) {
+            ChessPosition oneOfEight = new ChessPosition(position.getRow() - 1, position.getColumn() + 2);
+            redundant = checkSquare(returnMoves,oneOfEight);
+        }
+        return returnMoves;
     }
 
     private Collection<ChessMove> moveBishop() {
